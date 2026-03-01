@@ -199,6 +199,10 @@ h2 {
   gap: 0.5rem;
 }
 
+.auth-actions {
+  margin-top: 1rem;
+}
+
 .auth-welcome {
   margin-top: 0;
   margin-bottom: 1rem;

@@ -1,4 +1,4 @@
-# Personal Portfolio (MERN Stack)
+﻿# Personal Portfolio (MERN Stack)
 
 This is a full-stack personal portfolio project built with the **MERN stack**:
 - **MongoDB** for data storage
@@ -39,6 +39,7 @@ Create `.env` in `server/` using `server/.env.example`:
 PORT=5000
 MONGO_URI=mongodb://127.0.0.1:27017/portfolio_db
 CLIENT_URL=http://localhost:5173
+ALLOW_VERCEL_PREVIEWS=false
 ```
 
 Optional: seed sample projects
@@ -130,3 +131,4 @@ You can submit:
 - deployed frontend + backend links.
 
 If deploying, set environment variables for production URLs and MongoDB connection.
+

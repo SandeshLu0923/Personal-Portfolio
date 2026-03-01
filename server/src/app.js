@@ -6,6 +6,8 @@ import screenshotRoutes from "./routes/screenshotRoutes.js";
 
 const app = express();
 
+const normalizeOrigin = (origin) => origin.replace(/\/+$/, "");
+
 const normalizedClientOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
   .split(",")
   .map((origin) => origin.trim())
@@ -14,13 +16,32 @@ const normalizedClientOrigins = (process.env.CLIENT_URL || "http://localhost:517
     origin.startsWith("http://") || origin.startsWith("https://")
       ? origin
       : `https://${origin}`
-  );
+  )
+  .map(normalizeOrigin);
+
+const allowVercelPreviewOrigins = process.env.ALLOW_VERCEL_PREVIEWS === "true";
 
 app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
-      if (normalizedClientOrigins.includes(origin)) return callback(null, true);
+
+      const normalizedOrigin = normalizeOrigin(origin);
+      if (normalizedClientOrigins.includes(normalizedOrigin)) {
+        return callback(null, true);
+      }
+
+      if (allowVercelPreviewOrigins) {
+        try {
+          const parsed = new URL(normalizedOrigin);
+          if (parsed.hostname.endsWith(".vercel.app")) {
+            return callback(null, true);
+          }
+        } catch {
+          // Ignore parse errors and continue to rejection.
+        }
+      }
+
       return callback(new Error(`CORS blocked for origin: ${origin}`));
     },
   })

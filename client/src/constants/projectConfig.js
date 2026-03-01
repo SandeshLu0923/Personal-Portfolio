@@ -1,6 +1,13 @@
-﻿export const projectsData = [
+﻿export const PROJECT_SLUGS = {
+  weather: "weather-app",
+  clinic: "clinic-management-system",
+  operation: "operation-scheduler",
+};
+
+export const fallbackProjects = [
   {
-    slug: "weather-app",
+    _id: "1",
+    slug: PROJECT_SLUGS.weather,
     title: "Real-Time Weather App",
     description:
       "A modern, feature-rich weather web application built with React, Vite, and Tailwind CSS. It provides real-time weather information and air-quality data for locations around the world.",
@@ -9,10 +16,10 @@
     techStack: ["React", "Vite", "Tailwind CSS", "Axios", "Chart.js"],
     projectUrl: "",
     githubUrl: "https://github.com/SandeshLu0923/Weather",
-    featured: true,
   },
   {
-    slug: "clinic-management-system",
+    _id: "2",
+    slug: PROJECT_SLUGS.clinic,
     title: "Clinic Management System",
     description:
       "A comprehensive MERN stack clinic management system enabling seamless doctor-receptionist communication, efficient patient queue management, appointment booking, medical record maintenance, and integrated billing.",
@@ -33,10 +40,10 @@
     ],
     projectUrl: "",
     githubUrl: "https://github.com/SandeshLu0923/Clinic-management",
-    featured: true,
   },
   {
-    slug: "operation-scheduler",
+    _id: "3",
+    slug: PROJECT_SLUGS.operation,
     title: "Operation Scheduler For Hospital Management",
     description:
       "Operation Scheduler is a MERN-stack hospital OT (Operation Theater) scheduling system. It supports dynamic scheduling (additions, cancellation, postponement, emergency), resource tracking, pre/post-op events, reports upload, and OT monitoring dashboards.",
@@ -59,7 +66,27 @@
     ],
     projectUrl: "",
     githubUrl: "https://github.com/SandeshLu0923/Operation-Scheduler",
-    featured: true,
   },
 ];
 
+export const sections = ["home", "about", "projects", "contact"];
+
+export const clinicRoleButtons = [
+  { key: "doctor", label: "Doctor Screenshots" },
+  { key: "receptionist", label: "Receptionist Screenshots" },
+  { key: "patient", label: "Patient Screenshots" },
+];
+
+export const operationRoleButtons = [
+  { key: "admin", label: "Admin Screenshots" },
+  { key: "anesthesiologist", label: "Anesthesiologist Screenshots" },
+  { key: "surgeon", label: "Surgeon Screenshots" },
+  { key: "nurse", label: "Nurse Screenshots" },
+];
+
+export const defaultForm = {
+  name: "",
+  email: "",
+  subject: "",
+  message: "",
+};

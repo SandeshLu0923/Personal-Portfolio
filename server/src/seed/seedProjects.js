@@ -1,10 +1,10 @@
-import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { connectDB } from "../config/db.js";
+import { loadEnv } from "../config/loadEnv.js";
 import { Project } from "../models/Project.js";
 import { projectsData } from "./projectsData.js";
 
-dotenv.config();
+loadEnv();
 
 const seed = async () => {
   try {
@@ -21,4 +21,3 @@ const seed = async () => {
 };
 
 seed();
-

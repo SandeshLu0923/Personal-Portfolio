@@ -96,6 +96,33 @@ Open the shown Vite URL (typically `http://localhost:5173`).
 - `GET /api/projects`
 - `POST /api/contact`
 
+## Deployment (Recommended)
+
+### Backend (Render)
+
+1. Create a new **Web Service** from the `server` directory.
+2. Build command: `npm install`
+3. Start command: `npm start`
+4. Set environment variables:
+   - `PORT=5000`
+   - `MONGO_URI=<your mongodb uri>`
+   - `CLIENT_URL=<your deployed frontend url>`
+
+### Frontend (Vercel or Netlify)
+
+1. Deploy from the `client` directory.
+2. Build command: `npm run build`
+3. Output directory: `dist`
+4. Set environment variable:
+   - `VITE_API_BASE_URL=<your deployed backend url>`
+
+### Important
+
+- After first backend deploy, seed project data once:
+  - `cd server`
+  - `npm run seed`
+- `projectUrl` in `server/src/seed/projectsData.js` is currently empty. Add live links so the **Live Demo** button appears in the modal.
+
 ## Submission
 
 You can submit:

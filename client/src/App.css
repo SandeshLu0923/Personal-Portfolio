@@ -224,11 +224,27 @@ h2 {
   border: 1px solid var(--border);
   background: var(--surface);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  color: inherit;
+  font: inherit;
 }
 
 .project-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 26px rgba(15, 23, 42, 0.08);
+}
+
+.project-card:focus-visible,
+.role-btn:focus-visible,
+.nav-btn:focus-visible,
+.file-name-btn:focus-visible,
+.modal-close:focus-visible,
+.menu-toggle:focus-visible,
+.view-images-btn:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
 }
 
 .project-card img {

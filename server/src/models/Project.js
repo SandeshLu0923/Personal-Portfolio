@@ -1,7 +1,12 @@
-import mongoose from "mongoose";
+﻿import mongoose from "mongoose";
 
 const projectSchema = new mongoose.Schema(
   {
+    slug: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     title: {
       type: String,
       required: true,

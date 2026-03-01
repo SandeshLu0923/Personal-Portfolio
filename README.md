@@ -40,6 +40,7 @@ PORT=5000
 MONGO_URI=mongodb://127.0.0.1:27017/portfolio_db
 CLIENT_URL=http://localhost:5173
 ALLOW_VERCEL_PREVIEWS=false
+JWT_SECRET=replace-with-a-long-random-secret
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_SECURE=false
@@ -101,6 +102,11 @@ Open the shown Vite URL (typically `http://localhost:5173`).
 ## API Endpoints
 
 - `GET /api/health`
+- `POST /api/auth/register`
+- `POST /api/auth/verify-email`
+- `POST /api/auth/resend-code`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
 - `GET /api/projects`
 - `POST /api/contact`
 
@@ -116,6 +122,7 @@ Open the shown Vite URL (typically `http://localhost:5173`).
    - `MONGO_URI=<your mongodb uri>`
    - `CLIENT_URL=<your deployed frontend url>`
    - `ALLOW_VERCEL_PREVIEWS=true` (recommended for Vercel preview URLs)
+   - `JWT_SECRET=<long random secret>`
    - `SMTP_HOST=<smtp host>`
    - `SMTP_PORT=<smtp port>`
    - `SMTP_SECURE=<true|false>`

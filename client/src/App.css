@@ -179,6 +179,36 @@ h2 {
   border-bottom: 1px solid var(--border);
 }
 
+.section-auth {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: #f8fafc;
+}
+
+.auth-card {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.auth-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.auth-welcome {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.project-lock-message {
+  color: #92400e;
+  font-weight: 600;
+}
+
 .about-grid {
   margin-top: 1.4rem;
   display: grid;
@@ -234,6 +264,14 @@ h2 {
 .project-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 26px rgba(15, 23, 42, 0.08);
+}
+
+.project-card.locked,
+.project-card:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+  transform: none;
+  box-shadow: none;
 }
 
 .project-card:focus-visible,

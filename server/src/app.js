@@ -1,5 +1,6 @@
-import cors from "cors";
+﻿import cors from "cors";
 import express from "express";
+import authRoutes from "./routes/authRoutes.js";
 import projectRoutes from "./routes/projectRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
 import screenshotRoutes from "./routes/screenshotRoutes.js";
@@ -52,6 +53,7 @@ app.get("/api/health", (_req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
+app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/screenshots", screenshotRoutes);

@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+﻿import nodemailer from "nodemailer";
 
 const getMailConfig = () => {
   const host = process.env.SMTP_HOST;
@@ -23,6 +23,17 @@ const getMailConfig = () => {
   };
 };
 
+const createTransporter = (config) =>
+  nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
+    auth: {
+      user: config.user,
+      pass: config.pass,
+    },
+  });
+
 export const sendContactNotification = async ({
   name,
   email,
@@ -35,15 +46,7 @@ export const sendContactNotification = async ({
   }
 
   try {
-    const transporter = nodemailer.createTransport({
-      host: config.host,
-      port: config.port,
-      secure: config.secure,
-      auth: {
-        user: config.user,
-        pass: config.pass,
-      },
-    });
+    const transporter = createTransporter(config);
 
     await transporter.sendMail({
       from: config.from,
@@ -65,6 +68,34 @@ export const sendContactNotification = async ({
     return { sent: true };
   } catch (error) {
     console.error("Email notification failed:", error.message);
+    return { sent: false, reason: "send_failed" };
+  }
+};
+
+export const sendVerificationCodeEmail = async ({ email, name, code }) => {
+  const config = getMailConfig();
+  if (!config.isConfigured) {
+    return { sent: false, reason: "not_configured" };
+  }
+
+  try {
+    const transporter = createTransporter(config);
+    await transporter.sendMail({
+      from: config.from,
+      to: email,
+      subject: "Verify your portfolio account",
+      text: [
+        `Hi ${name || "there"},`,
+        "",
+        "Your verification code is:",
+        code,
+        "",
+        "This code expires in 15 minutes.",
+      ].join("\n"),
+    });
+    return { sent: true };
+  } catch (error) {
+    console.error("Verification email failed:", error.message);
     return { sent: false, reason: "send_failed" };
   }
 };

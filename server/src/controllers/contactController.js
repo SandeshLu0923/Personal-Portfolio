@@ -25,21 +25,15 @@ export const createContactMessage = async (req, res, next) => {
       message,
     });
 
-    const emailResult = await sendContactNotification({
+    // Send email in the background so API response is not delayed by SMTP latency.
+    sendContactNotification({
       name,
       email,
       subject,
       message,
+    }).catch((error) => {
+      console.error("Background email notification failed:", error.message);
     });
-
-    if (!emailResult.sent) {
-      return res.status(202).json({
-        message:
-          "Message saved successfully, but email notification could not be delivered.",
-        id: saved._id,
-        warning: true,
-      });
-    }
 
     return res.status(201).json({
       message: "Your message has been sent successfully.",

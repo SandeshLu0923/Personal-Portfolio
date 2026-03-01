@@ -13,6 +13,7 @@ import { getProjectSlug } from "./utils/projectUtils";
 import "./App.css";
 
 const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const authTokenStorageKey = "portfolio_auth_token";
 
 function App() {
   const [activeSection, setActiveSection] = useState("home");
@@ -24,6 +25,18 @@ function App() {
   const [submitStatus, setSubmitStatus] = useState({ type: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showImageViewer, setShowImageViewer] = useState(false);
+
+  const [authToken, setAuthToken] = useState(() => localStorage.getItem(authTokenStorageKey) || "");
+  const [currentUser, setCurrentUser] = useState(null);
+  const [authMode, setAuthMode] = useState("login");
+  const [authStatus, setAuthStatus] = useState({ type: "", message: "" });
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authForm, setAuthForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    code: "",
+  });
 
   const [activeClinicRole, setActiveClinicRole] = useState("doctor");
   const [activeClinicImageIndex, setActiveClinicImageIndex] = useState(0);
@@ -53,6 +66,7 @@ function App() {
   const isClinicProject = selectedProjectSlug === PROJECT_SLUGS.clinic;
   const isWeatherProject = selectedProjectSlug === PROJECT_SLUGS.weather;
   const isOperationProject = selectedProjectSlug === PROJECT_SLUGS.operation;
+  const isAuthenticated = Boolean(authToken && currentUser);
 
   const clinicImagesForRole = isClinicProject ? clinicScreensByRole[activeClinicRole] || [] : [];
   const activeClinicImage = clinicImagesForRole[activeClinicImageIndex] || null;
@@ -95,6 +109,30 @@ function App() {
 
     fetchProjects();
   }, []);
+
+  useEffect(() => {
+    if (!authToken) {
+      setCurrentUser(null);
+      return;
+    }
+
+    const loadProfile = async () => {
+      try {
+        const result = await fetchJson(`${apiBase}/api/auth/me`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        setCurrentUser(result.user || null);
+      } catch {
+        setCurrentUser(null);
+        setAuthToken("");
+        localStorage.removeItem(authTokenStorageKey);
+      }
+    };
+
+    loadProfile();
+  }, [authToken]);
 
   useEffect(() => {
     if (!selectedProject) return;
@@ -204,6 +242,16 @@ function App() {
     loadWeatherImages();
   }, [showImageViewer, isWeatherProject]);
 
+  const requireSignIn = (message) => {
+    if (isAuthenticated) return true;
+    setAuthStatus({ type: "error", message });
+    const authSection = document.getElementById("auth-gate");
+    if (authSection) {
+      authSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    return false;
+  };
+
   const closeModal = () => {
     setSelectedProject(null);
     setShowImageViewer(false);
@@ -221,6 +269,119 @@ function App() {
       setActiveOperationRole("admin");
       setActiveOperationImageIndex(0);
     }
+  };
+
+  const handleResumeAction = (type) => {
+    if (!requireSignIn("Please sign in first to open or download resume.")) return;
+
+    if (type === "open") {
+      window.open("/Resume.pdf", "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.href = "/Resume.pdf";
+    link.download = "Resume.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleAuthInputChange = (event) => {
+    const { name, value } = event.target;
+    setAuthForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleRegister = async (event) => {
+    event.preventDefault();
+    setAuthLoading(true);
+    try {
+      const result = await fetchJson(`${apiBase}/api/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: authForm.name,
+          email: authForm.email,
+          password: authForm.password,
+        }),
+      }, 30000);
+
+      setAuthMode("verify");
+      setAuthStatus({ type: "success", message: result.message || "Verification code sent." });
+    } catch (error) {
+      setAuthStatus({ type: "error", message: error.message || "Registration failed." });
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleVerifyEmail = async (event) => {
+    event.preventDefault();
+    setAuthLoading(true);
+    try {
+      const result = await fetchJson(`${apiBase}/api/auth/verify-email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: authForm.email, code: authForm.code }),
+      }, 30000);
+
+      setAuthMode("login");
+      setAuthStatus({ type: "success", message: result.message || "Email verified. Please login." });
+    } catch (error) {
+      setAuthStatus({ type: "error", message: error.message || "Verification failed." });
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    setAuthLoading(true);
+    try {
+      const result = await fetchJson(`${apiBase}/api/auth/resend-code`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: authForm.email }),
+      }, 30000);
+
+      setAuthStatus({ type: "success", message: result.message || "Verification code resent." });
+    } catch (error) {
+      setAuthStatus({ type: "error", message: error.message || "Failed to resend code." });
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    setAuthLoading(true);
+    try {
+      const result = await fetchJson(`${apiBase}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: authForm.email,
+          password: authForm.password,
+        }),
+      }, 30000);
+
+      localStorage.setItem(authTokenStorageKey, result.token);
+      setAuthToken(result.token);
+      setCurrentUser(result.user || null);
+      setAuthStatus({ type: "success", message: result.message || "Logged in successfully." });
+    } catch (error) {
+      setAuthStatus({ type: "error", message: error.message || "Login failed." });
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem(authTokenStorageKey);
+    setAuthToken("");
+    setCurrentUser(null);
+    setSelectedProject(null);
+    setShowImageViewer(false);
+    setAuthStatus({ type: "success", message: "You have been logged out." });
   };
 
   const handleInputChange = (event) => {
@@ -260,7 +421,7 @@ function App() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         },
-        12000,
+        65000,
       );
 
       setSubmitStatus({
@@ -338,13 +499,84 @@ function App() {
               </p>
               <div className="hero-actions">
                 <a href="#projects" className="btn btn-primary">View Projects</a>
-                <a href="/Resume.pdf" target="_blank" rel="noreferrer" className="btn btn-secondary">Open Resume</a>
-                <a href="/Resume.pdf" download className="btn btn-secondary">Download Resume</a>
+                <button type="button" className="btn btn-secondary" onClick={() => handleResumeAction("open")}>Open Resume</button>
+                <button type="button" className="btn btn-secondary" onClick={() => handleResumeAction("download")}>Download Resume</button>
               </div>
             </div>
             <div className="profile-card">
               <img src="/profile.jpeg" alt="Sandesh P profile photo" loading="lazy" />
             </div>
+          </div>
+        </section>
+
+        <section id="auth-gate" className="section section-auth">
+          <div className="container">
+            <h2>Account Access</h2>
+            <p>Sign in to unlock project details, screenshots, and resume actions.</p>
+
+            {isAuthenticated ? (
+              <div className="auth-card">
+                <p className="auth-welcome">Signed in as <strong>{currentUser?.name}</strong> ({currentUser?.email})</p>
+                <button type="button" className="btn btn-secondary" onClick={handleLogout}>Logout</button>
+              </div>
+            ) : (
+              <div className="auth-card">
+                <div className="auth-tabs">
+                  <button type="button" className={`role-btn ${authMode === "login" ? "active" : ""}`} onClick={() => setAuthMode("login")}>Login</button>
+                  <button type="button" className={`role-btn ${authMode === "register" ? "active" : ""}`} onClick={() => setAuthMode("register")}>Register</button>
+                  <button type="button" className={`role-btn ${authMode === "verify" ? "active" : ""}`} onClick={() => setAuthMode("verify")}>Verify Email</button>
+                </div>
+
+                {authMode === "register" && (
+                  <form className="contact-form" onSubmit={handleRegister}>
+                    <label>
+                      Full Name
+                      <input type="text" name="name" value={authForm.name} onChange={handleAuthInputChange} required />
+                    </label>
+                    <label>
+                      Email
+                      <input type="email" name="email" value={authForm.email} onChange={handleAuthInputChange} required />
+                    </label>
+                    <label>
+                      Password
+                      <input type="password" name="password" value={authForm.password} onChange={handleAuthInputChange} required minLength={6} />
+                    </label>
+                    <button className="btn btn-primary" type="submit" disabled={authLoading}>{authLoading ? "Creating..." : "Create Account"}</button>
+                  </form>
+                )}
+
+                {authMode === "verify" && (
+                  <form className="contact-form" onSubmit={handleVerifyEmail}>
+                    <label>
+                      Email
+                      <input type="email" name="email" value={authForm.email} onChange={handleAuthInputChange} required />
+                    </label>
+                    <label>
+                      Verification Code
+                      <input type="text" name="code" value={authForm.code} onChange={handleAuthInputChange} required />
+                    </label>
+                    <button className="btn btn-primary" type="submit" disabled={authLoading}>{authLoading ? "Verifying..." : "Verify Email"}</button>
+                    <button className="btn btn-secondary" type="button" onClick={handleResendCode} disabled={authLoading}>Resend Code</button>
+                  </form>
+                )}
+
+                {authMode === "login" && (
+                  <form className="contact-form" onSubmit={handleLogin}>
+                    <label>
+                      Email
+                      <input type="email" name="email" value={authForm.email} onChange={handleAuthInputChange} required />
+                    </label>
+                    <label>
+                      Password
+                      <input type="password" name="password" value={authForm.password} onChange={handleAuthInputChange} required minLength={6} />
+                    </label>
+                    <button className="btn btn-primary" type="submit" disabled={authLoading}>{authLoading ? "Signing in..." : "Sign In"}</button>
+                  </form>
+                )}
+              </div>
+            )}
+
+            {authStatus.message && <p className={`form-status ${authStatus.type}`}>{authStatus.message}</p>}
           </div>
         </section>
 
@@ -378,14 +610,21 @@ function App() {
           <div className="container">
             <h2>Projects</h2>
             <p>Click any project card to view details in a modal.</p>
+            {!isAuthenticated && (
+              <p className="project-lock-message">Please sign in to open project details and screenshots.</p>
+            )}
             <div className="projects-grid">
               {projects.map((project) => (
                 <button
                   key={project._id}
                   type="button"
-                  className="project-card"
-                  onClick={() => setSelectedProject(project)}
+                  className={`project-card ${!isAuthenticated ? "locked" : ""}`}
+                  onClick={() => {
+                    if (!requireSignIn("Please sign in first to view project details.")) return;
+                    setSelectedProject(project);
+                  }}
                   aria-label={`Open project details for ${project.title}`}
+                  disabled={!isAuthenticated}
                 >
                   <img src={project.imageUrl} alt={project.title} loading="lazy" />
                   <div className="project-content">
@@ -465,38 +704,38 @@ function App() {
         </div>
       </footer>
 
-      <ProjectModal
-        selectedProject={selectedProject}
-        showImageViewer={showImageViewer}
-        isClinicProject={isClinicProject}
-        isOperationProject={isOperationProject}
-        isWeatherProject={isWeatherProject}
-        closeModal={closeModal}
-        toggleImageViewer={toggleImageViewer}
-        activeClinicRole={activeClinicRole}
-        setActiveClinicRole={setActiveClinicRole}
-        activeClinicImageIndex={activeClinicImageIndex}
-        setActiveClinicImageIndex={setActiveClinicImageIndex}
-        clinicImagesForRole={clinicImagesForRole}
-        activeClinicImage={activeClinicImage}
-        moveClinicImage={moveClinicImage}
-        activeOperationRole={activeOperationRole}
-        setActiveOperationRole={setActiveOperationRole}
-        activeOperationImageIndex={activeOperationImageIndex}
-        setActiveOperationImageIndex={setActiveOperationImageIndex}
-        operationImagesForRole={operationImagesForRole}
-        activeOperationImage={activeOperationImage}
-        moveOperationImage={moveOperationImage}
-        weatherImages={weatherImages}
-        activeWeatherImageIndex={activeWeatherImageIndex}
-        setActiveWeatherImageIndex={setActiveWeatherImageIndex}
-        activeWeatherImage={activeWeatherImage}
-        moveWeatherImage={moveWeatherImage}
-      />
+      {isAuthenticated && (
+        <ProjectModal
+          selectedProject={selectedProject}
+          showImageViewer={showImageViewer}
+          isClinicProject={isClinicProject}
+          isOperationProject={isOperationProject}
+          isWeatherProject={isWeatherProject}
+          closeModal={closeModal}
+          toggleImageViewer={toggleImageViewer}
+          activeClinicRole={activeClinicRole}
+          setActiveClinicRole={setActiveClinicRole}
+          activeClinicImageIndex={activeClinicImageIndex}
+          setActiveClinicImageIndex={setActiveClinicImageIndex}
+          clinicImagesForRole={clinicImagesForRole}
+          activeClinicImage={activeClinicImage}
+          moveClinicImage={moveClinicImage}
+          activeOperationRole={activeOperationRole}
+          setActiveOperationRole={setActiveOperationRole}
+          activeOperationImageIndex={activeOperationImageIndex}
+          setActiveOperationImageIndex={setActiveOperationImageIndex}
+          operationImagesForRole={operationImagesForRole}
+          activeOperationImage={activeOperationImage}
+          moveOperationImage={moveOperationImage}
+          weatherImages={weatherImages}
+          activeWeatherImageIndex={activeWeatherImageIndex}
+          setActiveWeatherImageIndex={setActiveWeatherImageIndex}
+          activeWeatherImage={activeWeatherImage}
+          moveWeatherImage={moveWeatherImage}
+        />
+      )}
     </div>
   );
 }
 
 export default App;
-
-

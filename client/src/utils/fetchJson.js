@@ -20,6 +20,13 @@
     }
 
     return body;
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      throw new Error(
+        "Request timed out. If this is Render free tier cold start, wait a few seconds and retry."
+      );
+    }
+    throw error;
   } finally {
     clearTimeout(timeoutId);
   }

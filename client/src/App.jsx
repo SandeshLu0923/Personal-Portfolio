@@ -307,7 +307,10 @@ function App() {
       }, 30000);
 
       setAuthMode("verify");
-      setAuthStatus({ type: "success", message: result.message || "Verification code sent." });
+      setAuthStatus({
+        type: result?.warning ? "warning" : "success",
+        message: result.message || "Verification code sent.",
+      });
     } catch (error) {
       setAuthStatus({ type: "error", message: error.message || "Registration failed." });
     } finally {
@@ -343,7 +346,10 @@ function App() {
         body: JSON.stringify({ email: authForm.email }),
       }, 30000);
 
-      setAuthStatus({ type: "success", message: result.message || "Verification code resent." });
+      setAuthStatus({
+        type: result?.warning ? "warning" : "success",
+        message: result.message || "Verification code resent.",
+      });
     } catch (error) {
       setAuthStatus({ type: "error", message: error.message || "Failed to resend code." });
     } finally {

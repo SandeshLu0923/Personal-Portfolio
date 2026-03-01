@@ -9,7 +9,7 @@ const getMailConfig = () => {
   const to = process.env.SMTP_TO;
   const secure = process.env.SMTP_SECURE === "true";
 
-  const isConfigured = Boolean(host && port && user && pass && from && to);
+  const isConfigured = Boolean(host && port && user && pass && from);
 
   return {
     host,
@@ -41,7 +41,7 @@ export const sendContactNotification = async ({
   message,
 }) => {
   const config = getMailConfig();
-  if (!config.isConfigured) {
+  if (!config.isConfigured || !config.to) {
     return { sent: false, reason: "not_configured" };
   }
 

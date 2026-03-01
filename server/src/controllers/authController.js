@@ -53,9 +53,20 @@ export const register = async (req, res, next) => {
       verificationExpiresAt,
     });
 
-    sendVerificationCodeEmail({ email, name, code: verificationCode }).catch((error) => {
-      console.error("Verification email send failed:", error.message);
+    const verificationEmailResult = await sendVerificationCodeEmail({
+      email,
+      name,
+      code: verificationCode,
     });
+
+    if (!verificationEmailResult.sent) {
+      return res.status(202).json({
+        message:
+          "Account created, but verification email could not be sent. Check SMTP settings and click Resend Code.",
+        userId: user._id,
+        warning: true,
+      });
+    }
 
     return res.status(201).json({
       message: "Registration successful. Please verify your email with the 6-digit code.",
@@ -125,9 +136,19 @@ export const resendVerificationCode = async (req, res, next) => {
     user.verificationExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
     await user.save();
 
-    sendVerificationCodeEmail({ email, name: user.name, code: verificationCode }).catch((error) => {
-      console.error("Verification resend failed:", error.message);
+    const resendResult = await sendVerificationCodeEmail({
+      email,
+      name: user.name,
+      code: verificationCode,
     });
+
+    if (!resendResult.sent) {
+      return res.status(202).json({
+        message:
+          "Verification code generated, but email could not be sent. Check SMTP settings and try again.",
+        warning: true,
+      });
+    }
 
     return res.status(200).json({ message: "Verification code resent." });
   } catch (error) {

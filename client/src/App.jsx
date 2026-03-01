@@ -264,7 +264,7 @@ function App() {
       );
 
       setSubmitStatus({
-        type: "success",
+        type: result?.warning ? "warning" : "success",
         message: result?.message || "Message sent successfully.",
       });
       setFormData(defaultForm);

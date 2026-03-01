@@ -1,4 +1,5 @@
 import { ContactMessage } from "../models/ContactMessage.js";
+import { sendContactNotification } from "../services/mailer.js";
 
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -23,6 +24,22 @@ export const createContactMessage = async (req, res, next) => {
       subject,
       message,
     });
+
+    const emailResult = await sendContactNotification({
+      name,
+      email,
+      subject,
+      message,
+    });
+
+    if (!emailResult.sent) {
+      return res.status(202).json({
+        message:
+          "Message saved successfully, but email notification could not be delivered.",
+        id: saved._id,
+        warning: true,
+      });
+    }
 
     return res.status(201).json({
       message: "Your message has been sent successfully.",

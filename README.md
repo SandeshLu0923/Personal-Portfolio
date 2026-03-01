@@ -40,6 +40,13 @@ PORT=5000
 MONGO_URI=mongodb://127.0.0.1:27017/portfolio_db
 CLIENT_URL=http://localhost:5173
 ALLOW_VERCEL_PREVIEWS=false
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
+SMTP_FROM=Portfolio Contact <your-email@gmail.com>
+SMTP_TO=your-email@gmail.com
 ```
 
 Optional: seed sample projects
@@ -108,6 +115,14 @@ Open the shown Vite URL (typically `http://localhost:5173`).
    - `PORT=5000`
    - `MONGO_URI=<your mongodb uri>`
    - `CLIENT_URL=<your deployed frontend url>`
+   - `ALLOW_VERCEL_PREVIEWS=true` (recommended for Vercel preview URLs)
+   - `SMTP_HOST=<smtp host>`
+   - `SMTP_PORT=<smtp port>`
+   - `SMTP_SECURE=<true|false>`
+   - `SMTP_USER=<smtp username>`
+   - `SMTP_PASS=<smtp password or app password>`
+   - `SMTP_FROM=<from email>`
+   - `SMTP_TO=<your personal email>`
 
 ### Frontend (Vercel or Netlify)
 

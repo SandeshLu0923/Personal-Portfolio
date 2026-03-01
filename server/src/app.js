@@ -6,9 +6,23 @@ import screenshotRoutes from "./routes/screenshotRoutes.js";
 
 const app = express();
 
+const normalizedClientOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean)
+  .map((origin) =>
+    origin.startsWith("http://") || origin.startsWith("https://")
+      ? origin
+      : `https://${origin}`
+  );
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (normalizedClientOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
   })
 );
 app.use(express.json());

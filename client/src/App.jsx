@@ -44,6 +44,9 @@ function App() {
 
   const [weatherImages, setWeatherImages] = useState([]);
   const [activeWeatherImageIndex, setActiveWeatherImageIndex] = useState(0);
+  const clinicRequestedRef = useRef(new Set());
+  const operationRequestedRef = useRef(new Set());
+  const weatherRequestedRef = useRef(false);
 
   const year = useMemo(() => new Date().getFullYear(), []);
   const selectedProjectSlug = getProjectSlug(selectedProject);

@@ -1,4 +1,5 @@
-﻿import nodemailer from "nodemailer";
+﻿import dns from "dns/promises";
+import nodemailer from "nodemailer";
 
 const getMailConfig = () => {
   const host = process.env.SMTP_HOST;
@@ -8,6 +9,7 @@ const getMailConfig = () => {
   const from = process.env.SMTP_FROM || user;
   const to = process.env.SMTP_TO;
   const secure = process.env.SMTP_SECURE === "true";
+  const forceIpv4 = process.env.FORCE_SMTP_IPV4 !== "false";
 
   const isConfigured = Boolean(host && port && user && pass && from);
 
@@ -19,20 +21,43 @@ const getMailConfig = () => {
     from,
     to,
     secure,
+    forceIpv4,
     isConfigured,
   };
 };
 
-const createTransporter = (config) =>
-  nodemailer.createTransport({
-    host: config.host,
+const createTransporter = async (config) => {
+  let resolvedHost = config.host;
+
+  if (config.forceIpv4) {
+    try {
+      const ipv4Records = await dns.resolve4(config.host);
+      if (ipv4Records.length > 0) {
+        resolvedHost = ipv4Records[0];
+      }
+    } catch (error) {
+      console.warn("SMTP IPv4 resolve failed, using hostname fallback:", error.message);
+    }
+  }
+
+  return nodemailer.createTransport({
+    host: resolvedHost,
     port: config.port,
     secure: config.secure,
+    name: config.host,
+    family: config.forceIpv4 ? 4 : undefined,
+    connectionTimeout: 20000,
+    greetingTimeout: 15000,
+    socketTimeout: 30000,
+    tls: {
+      servername: config.host,
+    },
     auth: {
       user: config.user,
       pass: config.pass,
     },
   });
+};
 
 export const sendContactNotification = async ({
   name,
@@ -46,7 +71,7 @@ export const sendContactNotification = async ({
   }
 
   try {
-    const transporter = createTransporter(config);
+    const transporter = await createTransporter(config);
 
     await transporter.sendMail({
       from: config.from,
@@ -79,7 +104,7 @@ export const sendVerificationCodeEmail = async ({ email, name, code }) => {
   }
 
   try {
-    const transporter = createTransporter(config);
+    const transporter = await createTransporter(config);
     await transporter.sendMail({
       from: config.from,
       to: email,

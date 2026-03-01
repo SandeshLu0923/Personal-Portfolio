@@ -44,6 +44,7 @@ JWT_SECRET=replace-with-a-long-random-secret
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_SECURE=false
+FORCE_SMTP_IPV4=true
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-password
 SMTP_FROM=Portfolio Contact <your-email@gmail.com>
@@ -126,6 +127,7 @@ Open the shown Vite URL (typically `http://localhost:5173`).
    - `SMTP_HOST=<smtp host>`
    - `SMTP_PORT=<smtp port>`
    - `SMTP_SECURE=<true|false>`
+   - `FORCE_SMTP_IPV4=true` (recommended on Render for Gmail SMTP)
    - `SMTP_USER=<smtp username>`
    - `SMTP_PASS=<smtp password or app password>`
    - `SMTP_FROM=<from email>`

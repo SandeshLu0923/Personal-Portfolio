@@ -49,6 +49,8 @@ SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-password
 SMTP_FROM=Portfolio Contact <your-email@gmail.com>
 SMTP_TO=your-email@gmail.com
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxx
+RESEND_FROM=Portfolio <onboarding@resend.dev>
 ```
 
 Optional: seed sample projects
@@ -132,6 +134,8 @@ Open the shown Vite URL (typically `http://localhost:5173`).
    - `SMTP_PASS=<smtp password or app password>`
    - `SMTP_FROM=<from email>`
    - `SMTP_TO=<your personal email>`
+   - `RESEND_API_KEY=<optional fallback if SMTP fails>`
+   - `RESEND_FROM=<verified resend sender email>`
 
 ### Frontend (Vercel or Netlify)
 

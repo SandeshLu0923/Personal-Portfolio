@@ -31,7 +31,7 @@
       "JWT",
       "bcrypt",
     ],
-    projectUrl: "",
+    projectUrl: "https://clinic-management-theta-one.vercel.app",
     githubUrl: "https://github.com/SandeshLu0923/Clinic-management",
     featured: true,
   },

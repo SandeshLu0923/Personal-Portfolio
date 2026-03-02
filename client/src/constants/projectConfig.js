@@ -64,7 +64,7 @@ export const fallbackProjects = [
       "Winston",
       "Morgan",
     ],
-    projectUrl: "",
+    projectUrl: "https://operation-scheduler-client-cms822ewk-sandeshlu0923s-projects.vercel.app",
     githubUrl: "https://github.com/SandeshLu0923/Operation-Scheduler",
   },
 ];

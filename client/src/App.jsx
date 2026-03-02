@@ -86,7 +86,20 @@ function App() {
       try {
         const data = await fetchJson(`${apiBase}/api/projects`);
         if (Array.isArray(data) && data.length > 0) {
-          setProjects(data);
+          const fallbackBySlug = new Map(
+            fallbackProjects.map((project) => [getProjectSlug(project), project]),
+          );
+
+          const mergedProjects = data.map((project) => {
+            const fallback = fallbackBySlug.get(getProjectSlug(project));
+            return {
+              ...project,
+              projectUrl: project.projectUrl || fallback?.projectUrl || "",
+              githubUrl: project.githubUrl || fallback?.githubUrl || "",
+            };
+          });
+
+          setProjects(mergedProjects);
         }
       } catch {
         setProjects(fallbackProjects);

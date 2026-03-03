@@ -379,7 +379,7 @@ function App() {
                 <p>Fresher with 3 months of internship experience at Unified Mentor as a Full Stack Developer. Built a real-time weather application using external APIs and developed a full-stack Clinic Management System with MERN, including an operation scheduler for hospital management workflows.</p>
               </article>
               <article className="card">
-                <img src="https://images.unsplash.com/photo-1543357480-c60d40007a3f?auto=format&fit=crop&w=900&q=80" alt="Laptop with coding setup" className="about-card-image" loading="lazy" />
+                <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80" alt="Developer workspace with code on screens" className="about-card-image" loading="lazy" />
                 <h3>Hobbies</h3>
                 <p>Solving coding challenges, experimenting with UI design, playing cricket, watching series, and exploring different technology stacks.</p>
               </article>
@@ -423,23 +423,23 @@ function App() {
             <div className="contact-links">
               <a className="chip email" href="mailto:sandeshsmshetty9141@gmail.com">
                 <span className="tag">Email</span>
-                <span>sandeshsmshetty9141@gmail.com</span>
+                <span className="contact-value">sandeshsmshetty9141@gmail.com</span>
               </a>
               <a className="chip mobile" href="tel:+917338251903">
                 <span className="tag">Mobile</span>
-                <span>+91 7338251903</span>
+                <span className="contact-value">+91 7338251903</span>
               </a>
               <a className="chip whatsapp" href="https://wa.me/917338251903" target="_blank" rel="noreferrer">
                 <span className="tag">WhatsApp</span>
-                <span>Chat Now</span>
+                <span className="contact-value">Chat Now</span>
               </a>
               <a className="chip linkedin" href="https://www.linkedin.com/in/sandesh-shetty-245503246" target="_blank" rel="noreferrer">
                 <span className="tag">LinkedIn</span>
-                <span>Profile</span>
+                <span className="contact-value">Profile</span>
               </a>
               <a className="chip github" href="https://github.com/SandeshLu0923" target="_blank" rel="noreferrer">
                 <span className="tag">GitHub</span>
-                <span>@SandeshLu0923</span>
+                <span className="contact-value">@SandeshLu0923</span>
               </a>
             </div>
             <form className="contact-form" onSubmit={handleSubmit} noValidate>

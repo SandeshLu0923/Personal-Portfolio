@@ -252,6 +252,8 @@ h2 {
 }
 
 .project-card {
+  display: flex;
+  flex-direction: column;
   cursor: pointer;
   overflow: hidden;
   border-radius: 16px;
@@ -297,6 +299,10 @@ h2 {
 
 .project-content {
   padding: 1rem;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.7rem;
 }
 
 .about-grid .card h3,
@@ -322,6 +328,7 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  margin-top: auto;
 }
 
 .chips span {
@@ -654,7 +661,7 @@ h2 {
   .profile-card {
     width: min(220px, 75vw);
     padding: 0.65rem;
-    justify-self: start;
+    justify-self: center;
   }
 
   .profile-card img {
@@ -700,6 +707,10 @@ h2 {
     padding: 0.4rem 0.62rem;
   }
 
+  .contact-links .chip .contact-value {
+    display: none;
+  }
+
   .contact-form input,
   .contact-form textarea {
     font-size: 0.86rem;
@@ -733,8 +744,8 @@ h2 {
   }
 
   .contact-links .chip {
-    width: 100%;
-    justify-content: space-between;
+    width: auto;
+    justify-content: center;
   }
 
   .site-footer p {
